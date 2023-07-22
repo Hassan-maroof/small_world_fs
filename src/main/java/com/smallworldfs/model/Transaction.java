@@ -1,13 +1,13 @@
 package com.smallworldfs.model;
 
 public record Transaction(
-    int mtn,
+    Integer mtn,
     double amount,
     String senderFullName,
-    int senderAge,
+    Integer senderAge,
     String beneficiaryFullName,
-    int beneficiaryAge,
-    int issueId,
+    Integer beneficiaryAge,
+    Integer issueId,
     Boolean issueSolved,
     String issueMessage
 ) {

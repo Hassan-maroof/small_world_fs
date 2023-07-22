@@ -4,10 +4,13 @@ import com.smallworldfs.model.Transaction;
 import com.smallworldfs.service.impl.TransactionService;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class TransactionDataFetcher {
@@ -18,9 +21,8 @@ public class TransactionDataFetcher {
    * Returns the sum of the amounts of all transactions
    */
   public double getTotalTransactionAmount() {
-    double totalTransactionAmount = 00.0;
     try {
-      totalTransactionAmount = transactionService.getAllTransaction()
+      return transactionService.getAllTransaction()
           .stream()
           .distinct()
           .mapToDouble(Transaction::amount)
@@ -28,16 +30,14 @@ public class TransactionDataFetcher {
     } catch (Exception e) {
       throw new UnsupportedOperationException();
     }
-    return totalTransactionAmount;
   }
 
   /**
    * Returns the sum of the amounts of all transactions sent by the specified client
    */
   public double getTotalTransactionAmountSentBy(String senderFullName) {
-    double totalAmountByName = 00.0;
     try {
-      totalAmountByName = transactionService.getAllTransaction().stream().distinct()
+      return transactionService.getAllTransaction().stream().distinct()
           .filter(transaction ->
               senderFullName.equals(transaction.senderFullName()))
           .mapToDouble(Transaction::amount)
@@ -45,32 +45,36 @@ public class TransactionDataFetcher {
     } catch (Exception e) {
       throw new UnsupportedOperationException();
     }
-    return totalAmountByName;
   }
 
   /**
    * Returns the highest transaction amount
    */
   public double getMaxTransactionAmount() {
-    double maxTransactionAmount = 00.0;
     try {
-      maxTransactionAmount = transactionService.getAllTransaction()
+      return transactionService.getAllTransaction()
           .stream()
+          .distinct()
           .mapToDouble(Transaction::amount)
           .max()
           .orElse(0.0);
     } catch (Exception e) {
       throw new UnsupportedOperationException();
     }
-    return maxTransactionAmount;
   }
 
   /**
    * Counts the number of unique clients that sent or received a transaction
    */
   public long countUniqueClients() {
-
-    throw new UnsupportedOperationException();
+    try {
+      return transactionService.getAllTransaction()
+          .stream()
+          .distinct()
+          .count();
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
@@ -85,28 +89,59 @@ public class TransactionDataFetcher {
    * Returns all transactions indexed by beneficiary name
    */
   public Map<String, Transaction> getTransactionsByBeneficiaryName() {
-    throw new UnsupportedOperationException();
+    try {
+      return transactionService.getAllTransaction()
+          .stream()
+          .collect(Collectors.toMap(Transaction::beneficiaryFullName , Function.identity()));
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
    * Returns the identifiers of all open compliance issues
    */
   public Set<Integer> getUnsolvedIssueIds() {
-    throw new UnsupportedOperationException();
+    try {
+      return transactionService.getAllTransaction()
+          .stream()
+          .filter( transaction -> Boolean.FALSE.equals(transaction.issueSolved()))
+          .map(Transaction::issueId)
+          .collect(Collectors.toSet());
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
    * Returns a list of all solved issue messages
    */
   public List<String> getAllSolvedIssueMessages() {
-    throw new UnsupportedOperationException();
+    try {
+      return transactionService.getAllTransaction()
+          .stream()
+          .filter( transaction -> Boolean.TRUE.equals(transaction.issueSolved()))
+          .map(Transaction::issueMessage)
+          .collect(Collectors.toList());
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
    * Returns the 3 transactions with the highest amount sorted by amount descending
    */
   public List<Transaction> getTop3TransactionsByAmount() {
-    throw new UnsupportedOperationException();
+    try {
+      return transactionService.getAllTransaction()
+          .stream()
+          .distinct()
+          .sorted(Comparator.comparingDouble(Transaction::amount).reversed())
+          .limit(3)
+          .toList();
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
   /**
