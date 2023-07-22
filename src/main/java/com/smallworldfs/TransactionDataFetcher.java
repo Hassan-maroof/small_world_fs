@@ -1,6 +1,7 @@
-package com.smallworld;
+package com.smallworldfs;
 
-import com.smallworld.data.Transaction;
+import com.smallworldfs.data.Transaction;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
