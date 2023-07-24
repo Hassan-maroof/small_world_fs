@@ -92,7 +92,7 @@ public class TransactionDataFetcher {
     try {
       return transactionService.getAllTransaction()
           .stream()
-          .collect(Collectors.toMap(Transaction::beneficiaryFullName , Function.identity()));
+          .collect(Collectors.toMap(Transaction::beneficiaryFullName, Function.identity()));
     } catch (Exception e) {
       throw new UnsupportedOperationException();
     }
@@ -105,7 +105,7 @@ public class TransactionDataFetcher {
     try {
       return transactionService.getAllTransaction()
           .stream()
-          .filter( transaction -> Boolean.FALSE.equals(transaction.issueSolved()))
+          .filter(transaction -> Boolean.FALSE.equals(transaction.issueSolved()))
           .map(Transaction::issueId)
           .collect(Collectors.toSet());
     } catch (Exception e) {
@@ -120,7 +120,7 @@ public class TransactionDataFetcher {
     try {
       return transactionService.getAllTransaction()
           .stream()
-          .filter( transaction -> Boolean.TRUE.equals(transaction.issueSolved()))
+          .filter(transaction -> Boolean.TRUE.equals(transaction.issueSolved()))
           .map(Transaction::issueMessage)
           .collect(Collectors.toList());
     } catch (Exception e) {
@@ -148,7 +148,16 @@ public class TransactionDataFetcher {
    * Returns the senderFullName of the sender with the most total sent amount
    */
   public Optional<String> getTopSender() {
-    throw new UnsupportedOperationException();
+    try {
+      Map<String, Double> topSenderMap = transactionService.getAllTransaction()
+          .stream().collect(Collectors.
+              groupingBy(Transaction::senderFullName, Collectors.summingDouble(Transaction::amount)));
+      return topSenderMap.entrySet().stream()
+          .max(Comparator.comparingDouble(Map.Entry::getValue))
+          .map(Map.Entry::getKey);
+    } catch (Exception e) {
+      throw new UnsupportedOperationException();
+    }
   }
 
 }
